@@ -10,12 +10,15 @@
  ******************************************************************************/
 package com.salesforce.ide.schemabrowser.ui.tableviewer;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -25,11 +28,17 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -156,11 +165,47 @@ public class QueryTableViewer {
         }
         int style = SWT.SINGLE | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.HIDE_SELECTION;
         table = new Table(parent, style);
-
+        
+        
+        Menu contextMenu = new Menu(table);
+        
+        table.setMenu(contextMenu);
+        MenuItem mItemCopy = new MenuItem(contextMenu, SWT.None);
+        mItemCopy.setText("Copy");
+        mItemCopy.setData("name","copy");
+         
+        mItemCopy.addSelectionListener(new MySelectionListener());
+        
+        MenuItem mItemCopyRow = new MenuItem(contextMenu, SWT.None);
+        mItemCopyRow.setText("Copy Row");
+        mItemCopyRow.setData("name","copyrow");
+        mItemCopyRow.addSelectionListener( new MySelectionListener() );
+        
+        
+        
         table.setLinesVisible(true);
         table.setHeaderVisible(true);
         table.setToolTipText("Double click on parent or child cells (when present) to see the related records");
-
+        
+        table.addListener(SWT.MouseDown, new Listener() {
+        	
+        	 @Override
+            public void handleEvent(Event event) {
+        		 System.out.println("table event : "+event);
+        		 int rindex = table.getSelectionIndex();
+                 if (rindex == -1) return; //no row selected
+                 
+                 tableClickPoint = new Point(event.x, event.y);
+            	TableItem[] selection = table.getSelection();
+                if(selection.length!=0 && (event.button == 3)){
+                	
+                    contextMenu.setVisible(true);
+                    System.out.println("Selected: "+selection[0].getText());
+                    
+                }
+            }
+          });
+        
         ArrayList<String> _columnNames = new ArrayList<>();
 
         if (qr != null && qr.getSize() > 0) {
@@ -383,4 +428,68 @@ public class QueryTableViewer {
     public Table getTable() {
         return table;
     }
+    
+    
+    class MySelectionListener extends SelectionAdapter{
+    	@Override
+    	public void widgetSelected(SelectionEvent e) {
+    		System.out.println(">>MySelectionListener:  e " +e);
+    		MenuItem mitem = (MenuItem) e.getSource();
+    		
+    		 if(mitem.getData("name").equals("copy"))
+    		 {
+    			 String val = getTextCell();
+ 				 setToClipboard(val);
+    		 }else if(mitem.getData("name").equals("copyrow"))
+    		 {
+    			 TableItem item = table.getItem(tableClickPoint);
+    		        if (item != null)
+    		        {
+    		        	String val = "";
+    			        for (int i = 0; i < table.getColumnCount(); i++) {
+    			            com.salesforce.ide.schemabrowser.ui.tableviewer.DataRow d_row = (DataRow) item.getData();
+    	                	val += (String) d_row.getRecord().get(i).getValue() +"\t|\t";
+    			        }
+    			        val = StringUtils.removeEnd(val, "\t|\t");
+//    			        System.out.println("Item  >>val: "+ val);
+    			        setToClipboard(val);
+    		        }
+    		 }
+    		
+    	}
+    	
+    	void setToClipboard(String text)
+    	{
+    		Toolkit.getDefaultToolkit()
+            .getSystemClipboard()
+            .setContents(
+                    new StringSelection(text),
+                    null
+            );
+    	}
+		String getTextCell()
+		{
+			String val = null;
+	        TableItem item = table.getItem(tableClickPoint);
+	        if (item != null)
+	        {
+		        for (int i = 0; i < table.getColumnCount(); i++) {
+		          Rectangle rect = item.getBounds(i);
+		          if (rect.contains(tableClickPoint)) {
+//		            int index = table.indexOf(item);
+		            com.salesforce.ide.schemabrowser.ui.tableviewer.DataRow d_row = (DataRow) item.getData();
+                	val = (String) d_row.getRecord().get(i).getValue();
+                	
+//		            System.out.println("Item " + index + "-" + i +">>val: "+ val);
+		          }
+		        }
+	        }
+            
+            return val;
+		}
+		
+    }
+    
+    private Point tableClickPoint;
+     
 }
