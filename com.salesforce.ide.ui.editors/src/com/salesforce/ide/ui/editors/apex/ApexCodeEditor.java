@@ -78,6 +78,7 @@ import com.salesforce.ide.core.internal.utils.Constants;
 import com.salesforce.ide.core.internal.utils.Utils;
 import com.salesforce.ide.ui.ForceIdeUIPlugin;
 import com.salesforce.ide.ui.editors.ForceIdeEditorsPlugin;
+import com.salesforce.ide.ui.editors.actions.ToggleCommentAction;
 import com.salesforce.ide.ui.editors.apex.outline.ApexContentOutlinePage;
 import com.salesforce.ide.ui.editors.apex.outline.OutlineViewDispatcher;
 import com.salesforce.ide.ui.editors.apex.preferences.PreferenceConstants;
@@ -99,6 +100,8 @@ public class ApexCodeEditor extends TextEditor implements IShowInSource {
     private static final String ACTION_DEFINE_FOLDING_REGION = "DefineFoldingRegion";
     private static final String ACTION_CONTENT_ASSIST_TIP = "ContentAssistTip";
     private static final String ACTION_CONTENT_ASSIST_PROPOSAL = "ContentAssistProposal";
+    private static final String ACTION_TOGGLE_COMMENT = "ToggleComment";
+
 
     protected final static char[] BRACKETS = { '{', '}', '(', ')', '[', ']', '<', '>' };
 
@@ -173,6 +176,10 @@ public class ApexCodeEditor extends TextEditor implements IShowInSource {
             "ApexEditor.DefineFoldingRegion.",
             this);
         setAction(ACTION_DEFINE_FOLDING_REGION, action);
+        
+        action = new ToggleCommentAction(EditorMessages.getResourceBundle(),"ApexEditor.ToggleComment",this);
+        setAction(ACTION_TOGGLE_COMMENT, action);
+        
     }
 
     /**
