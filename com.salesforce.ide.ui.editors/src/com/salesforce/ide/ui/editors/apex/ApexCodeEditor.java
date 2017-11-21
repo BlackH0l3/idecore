@@ -100,7 +100,6 @@ public class ApexCodeEditor extends TextEditor implements IShowInSource {
     private static final String ACTION_DEFINE_FOLDING_REGION = "DefineFoldingRegion";
     private static final String ACTION_CONTENT_ASSIST_TIP = "ContentAssistTip";
     private static final String ACTION_CONTENT_ASSIST_PROPOSAL = "ContentAssistProposal";
-    private static final String ACTION_TOGGLE_COMMENT = "ToggleComment";
 
 
     protected final static char[] BRACKETS = { '{', '}', '(', ')', '[', ']', '<', '>' };
@@ -178,7 +177,7 @@ public class ApexCodeEditor extends TextEditor implements IShowInSource {
         setAction(ACTION_DEFINE_FOLDING_REGION, action);
         
         action = new ToggleCommentAction(EditorMessages.getResourceBundle(),"ApexEditor.ToggleComment",this);
-        setAction(ACTION_TOGGLE_COMMENT, action);
+        setAction(ToggleCommentAction.ACTION_TOGGLE_COMMENT, action);
         
     }
 
