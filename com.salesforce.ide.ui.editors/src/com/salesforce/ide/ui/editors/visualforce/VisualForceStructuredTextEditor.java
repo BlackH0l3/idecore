@@ -10,21 +10,22 @@
  ******************************************************************************/
 package com.salesforce.ide.ui.editors.visualforce;
 
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.text.contentassist.ContentAssistEvent;
-import org.eclipse.jface.text.contentassist.ICompletionListener;
-import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.eclipse.jface.text.source.ContentAssistantFacade;
-import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.ui.IWorkbenchCommandConstants;
+import org.eclipse.ui.editors.text.ITextEditorHelpContextIds;
+import org.eclipse.ui.ide.IDEActionFactory;
+import org.eclipse.ui.texteditor.AddMarkerAction;
+import org.eclipse.ui.texteditor.ResourceAction;
 import org.eclipse.wst.sse.ui.StructuredTextEditor;
-import org.eclipse.wst.sse.ui.internal.StructuredTextViewer;
 
 import com.salesforce.ide.core.internal.utils.Constants;
 import com.salesforce.ide.ui.editors.actions.ToggleCommentAction;
 import com.salesforce.ide.ui.editors.internal.utils.EditorMessages;
 
 public class VisualForceStructuredTextEditor extends StructuredTextEditor {
-
+	ResourceAction bookmarkAction;
     public VisualForceStructuredTextEditor() {
         super();
     }
@@ -39,31 +40,18 @@ public class VisualForceStructuredTextEditor extends StructuredTextEditor {
     protected void createActions() {
         super.createActions();
 
-//        IAction action = new TextOperationAction(
-//            EditorMessages.getResourceBundle(),
-//            "ApexEditor.ContentAssistProposal.",
-//            this, ISourceViewer.CONTENTASSIST_PROPOSALS);
-//        action.setActionDefinitionId(ITextEditorActionDefinitionIds.CONTENT_ASSIST_PROPOSALS);
-//        setAction(ACTION_CONTENT_ASSIST_PROPOSAL, action);
-//
-//        action = new TextOperationAction(
-//            EditorMessages.getResourceBundle(),
-//            "ApexEditor.ContentAssistTip.",
-//            this,
-//            ISourceViewer.CONTENTASSIST_CONTEXT_INFORMATION);
-//        action.setActionDefinitionId(ITextEditorActionDefinitionIds.CONTENT_ASSIST_CONTEXT_INFORMATION);
-//        setAction(ACTION_CONTENT_ASSIST_TIP, action);
-//
-//        action = new DefineFoldingRegionAction(
-//            EditorMessages.getResourceBundle(),
-//            "ApexEditor.DefineFoldingRegion.",
-//            this);
-//        setAction(ACTION_DEFINE_FOLDING_REGION, action);
-        
         IAction action = new ToggleCommentAction(EditorMessages.getResourceBundle(),"ApexEditor.ToggleComment",this);
         setAction(ToggleCommentAction.ACTION_TOGGLE_COMMENT, action);
         
-        
+        bookmarkAction = new AddMarkerAction(EditorMessages.getResourceBundle(), "ApexEditor.AddBookmark.", this, IMarker.BOOKMARK, true);
+		bookmarkAction.setHelpContextId(ITextEditorHelpContextIds.BOOKMARK_ACTION);
+		bookmarkAction.setActionDefinitionId(IWorkbenchCommandConstants.EDIT_ADD_BOOKMARK);
+		setAction(IDEActionFactory.BOOKMARK.getId(), bookmarkAction);
     }
- 
+    
+   
+    @Override
+    protected void addExtendedRulerContextMenuActions(IMenuManager menu) {
+    	menu.add(bookmarkAction);
+	}
 }
