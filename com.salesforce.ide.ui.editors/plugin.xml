@@ -30,13 +30,13 @@
       id="com.salesforce.ide.ui.command.mergeFields"
       name="%action.label"
       />
-      <command
-      categoryId="com.salesforce.ide.ui.commands.category"
-      description="%tooltip.tooglecomment"
-      helpContextId="com.salesforce.ide.documentation.tooglecomment"
-      id="com.salesforce.ide.ui.command.tooglecomment"
-      name="%action.label"
-      />
+    <command
+          categoryId="com.salesforce.ide.ui.commands.category"
+          description="my tooglecomment"
+          helpContextId="com.salesforce.ide.documentation.tooglecomment"
+          id="com.salesforce.ide.ui.editors.command.tooglecomment"
+          name="mytooglecomment">
+    </command>
   </extension>
 
   <extension point="org.eclipse.ui.handlers">
@@ -369,10 +369,13 @@
     	preferredPerspectives="com.salesforce.ide.perspective" 
     	project="false" />
 </extension>
-<extension point="org.eclipse.ui.bindings">
-    	<key sequence="M1+/"
-         	commandId="com.salesforce.ide.ui.command.tooglecomment"
-         	contextId="com.salesforce.ide.context"
-         	schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
- 	</extension>
+<extension
+      point="org.eclipse.ui.bindings">
+   <key
+         commandId="com.salesforce.ide.ui.editors.command.tooglecomment"
+         contextId="com.salesforce.ide.context"
+         schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+         sequence="M1+M2+/">
+   </key>
+</extension>
 </plugin>

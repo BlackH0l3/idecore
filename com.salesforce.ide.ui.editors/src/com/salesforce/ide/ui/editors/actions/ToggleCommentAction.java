@@ -52,8 +52,8 @@ public class ToggleCommentAction extends TextEditorAction {
 	}
 
 	private void init() {
-		setText("Toggle comment");
-		setActionDefinitionId("com.salesforce.ide.ui.command.tooglecomment");
+		setText("My Toggle Comment");
+		setActionDefinitionId("com.salesforce.ide.ui.editors.command.tooglecomment");
 		
 		update();
 	}
