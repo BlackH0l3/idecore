@@ -2,7 +2,7 @@
 <modelVersion>4.0.0</modelVersion>
 <groupId>com.salesforce.ide</groupId>
 <artifactId>com.salesforce.ide.main.external</artifactId>
-<version>38.0.0-SNAPSHOT</version>
+<version>39.0.0-SNAPSHOT</version>
 <packaging>pom</packaging>
 	<parent>
 		<groupId>com.salesforce.ide</groupId>
