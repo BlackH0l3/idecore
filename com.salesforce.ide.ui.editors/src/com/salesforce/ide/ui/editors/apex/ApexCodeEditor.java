@@ -41,6 +41,7 @@ import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.jface.text.ITextViewerExtension5;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
+import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.ISharedTextColors;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -120,6 +121,8 @@ public class ApexCodeEditor extends TextEditor implements IShowInSource {
 
     private final Object fReconcilerLock = new Object();
     
+    private MyMarkOccurence myOccurence;
+    
     public Object getReconcilerLock() {
         return fReconcilerLock;
     }
@@ -178,9 +181,8 @@ public class ApexCodeEditor extends TextEditor implements IShowInSource {
         
         action = new ToggleCommentAction(EditorMessages.getResourceBundle(),"ApexEditor.ToggleComment",this);
         setAction(ToggleCommentAction.ACTION_TOGGLE_COMMENT, action);
-        
+         
     }
-
     /**
      * The <code>JavaEditor</code> implementation of this <code>AbstractTextEditor</code> method performs any extra
      * disposal actions required by the java editor.
@@ -391,8 +393,10 @@ public class ApexCodeEditor extends TextEditor implements IShowInSource {
         ISourceViewer sourceViewer = getSourceViewer();
         if (sourceViewer instanceof ITextViewerExtension)
             ((ITextViewerExtension) sourceViewer).prependVerifyKeyListener(fBracketInserter);
+        
+        myOccurence = new MyMarkOccurence(getSourceViewer(),getEditorInput(),getDocumentProvider());
     }
-
+    
     /*
      * @see org.eclipse.ui.texteditor.ExtendedTextEditor#createSourceViewer(org.eclipse.swt.widgets.Composite,
      *      org.eclipse.jface.text.source.IVerticalRuler, int)
@@ -630,7 +634,19 @@ public class ApexCodeEditor extends TextEditor implements IShowInSource {
 
     private class EditorSelectionChangedListener extends AbstractSelectionChangedListener {
         @Override
-        public void selectionChanged(SelectionChangedEvent event) {}
+        public void selectionChanged(SelectionChangedEvent event) {
+        	TextSelection selection =   (TextSelection) event.getSelection();
+        	 IDocument document= getSourceViewer().getDocument();
+        	
+        	 try {
+				myOccurence.perform(document, selection);
+			} catch (BadLocationException e) {
+//				e.printStackTrace();
+			}catch(Exception e2)
+        	 {
+//				e2.printStackTrace();
+        	 }
+        }
     }
 
     protected boolean isActivePart() {
