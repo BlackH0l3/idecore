@@ -13,8 +13,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jdt.internal.core.manipulation.search.IOccurrencesFinder;
-import org.eclipse.jdt.internal.core.manipulation.search.IOccurrencesFinder.OccurrenceLocation;
 import org.eclipse.jdt.internal.ui.text.JavaWordFinder;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.FindReplaceDocumentAdapter;
@@ -62,7 +60,7 @@ public class MyMarkOccurence {
 		}
     	if(StringUtils.isBlank(word))return;
     	
-    	List<OccurrenceLocation> listLocations= new ArrayList<OccurrenceLocation>();
+    	List<MyOccurrenceLocation> listLocations= new ArrayList<MyOccurrenceLocation>();
     	FindReplaceDocumentAdapter findAdaptor = new FindReplaceDocumentAdapter(document);
 		int startOffset = 0;
     	do {
@@ -71,13 +69,13 @@ public class MyMarkOccurence {
 				break;
 			}
 			//flag: text type. string, method,... 0:gray, 1: yellow,...
-			OccurrenceLocation oc = new OccurrenceLocation(match.getOffset(),match.getLength(),0,"");
+			MyOccurrenceLocation oc = new MyOccurrenceLocation(match.getOffset(),match.getLength(),0,"");
 			listLocations.add(oc);
 			startOffset = match.getOffset() + match.getLength();
 			 
 		} while (startOffset < document.getLength());
     	
-    	fOccurrencesFinderJob= new OccurrencesFinderJob(document,  listLocations.toArray(new OccurrenceLocation[listLocations.size()] ), selection);
+    	fOccurrencesFinderJob= new OccurrencesFinderJob(document,  listLocations.toArray(new MyOccurrenceLocation[listLocations.size()] ), selection);
     	fOccurrencesFinderJob.run(new NullProgressMonitor()); 
     	
 	}
@@ -88,9 +86,9 @@ public class MyMarkOccurence {
 		private final ISelection fSelection;
 		private final ISelectionValidator fPostSelectionValidator;
 		private boolean fCanceled= false;
-		private final OccurrenceLocation[] fLocations;
+		private final MyOccurrenceLocation[] fLocations;
 
-		public OccurrencesFinderJob(IDocument document, OccurrenceLocation[] locations, ISelection selection) {
+		public OccurrencesFinderJob(IDocument document, MyOccurrenceLocation[] locations, ISelection selection) {
 			super("Occurrences Marker");
 			fDocument= document;
 			fSelection= selection;
@@ -146,11 +144,11 @@ public class MyMarkOccurence {
 				if (isCanceled(progressMonitor))
 					return Status.CANCEL_STATUS;
 
-				OccurrenceLocation location= fLocations[i];
+				MyOccurrenceLocation location= fLocations[i];
 				Position position= new Position(location.getOffset(), location.getLength());
 
 				String description= location.getDescription();
-				String annotationType= (location.getFlags() == IOccurrencesFinder.F_WRITE_OCCURRENCE) ? "org.eclipse.jdt.ui.occurrences.write" : "org.eclipse.jdt.ui.occurrences"; //$NON-NLS-1$ //$NON-NLS-2$
+				String annotationType= (location.getFlags() == 1) ? "org.eclipse.jdt.ui.occurrences.write" : "org.eclipse.jdt.ui.occurrences"; //$NON-NLS-1$ //$NON-NLS-2$
 
 				annotationMap.put(new Annotation(annotationType, false, description), position);
 			}
@@ -224,5 +222,43 @@ public class MyMarkOccurence {
 			}
 			fOccurrenceAnnotations= null;
 		}
+	}
+	
+	class MyOccurrenceLocation{
+		int offset,length,flag;
+		String desc;
+		public MyOccurrenceLocation(int offset,int length,int flag,String desc)
+		{
+			this.offset= offset;
+			this.length = length;
+			this.flag = flag;
+			this.desc = desc;
+		}
+		public int getOffset() {
+			return offset;
+		}
+		public void setOffset(int offset) {
+			this.offset = offset;
+		}
+		public int getLength() {
+			return length;
+		}
+		public void setLength(int length) {
+			this.length = length;
+		}
+		public int getFlags() {
+			return flag;
+		}
+		public void setFlag(int flag) {
+			this.flag = flag;
+		}
+		public String getDescription() {
+			return desc;
+		}
+		public void setDesc(String desc) {
+			this.desc = desc;
+		}
+		
+		
 	}
 }
