@@ -42,6 +42,8 @@ public class MyMarkOccurence {
 	private long fMarkOccurrenceModificationStamp= IDocumentExtension4.UNKNOWN_MODIFICATION_STAMP;
 	private IRegion fMarkOccurrenceTargetRegion;
 	
+	private String preWord;
+	
 	public MyMarkOccurence(ITextViewer textViewer,Object editorInput,IDocumentProvider documentProvider)
 	{
 		this.textViewer = textViewer;
@@ -55,11 +57,13 @@ public class MyMarkOccurence {
     	String word = "";
     	try {
 			word = document.get(region.getOffset(), region.getLength());
+			
 		} catch (BadLocationException e) {
 			e.printStackTrace();
 		}
-    	if(StringUtils.isBlank(word))return;
+    	if(StringUtils.isBlank(word) || StringUtils.equals(preWord, word))return;
     	
+    	preWord = word;
     	List<MyOccurrenceLocation> listLocations= new ArrayList<MyOccurrenceLocation>();
     	FindReplaceDocumentAdapter findAdaptor = new FindReplaceDocumentAdapter(document);
 		int startOffset = 0;
